@@ -63,3 +63,108 @@ const galleryItems = [
     description: "Lighthouse Coast Sea",
   },
 ];
+
+const refs = {
+  galleryCardsRef: document.querySelector(".js-gallery"),
+  lightboxRef: document.querySelector(".js-lightbox"),
+  lightboxImgRef: document.querySelector(".lightbox__image"),
+  lightboxCloseBtn: document.querySelector(
+    'button[data-action="close-lightbox"]'
+  ),
+  lightboxOverlay: document.querySelector(".lightbox__overlay"),
+};
+
+const {
+  galleryCardsRef,
+  lightboxRef,
+  lightboxImgRef,
+  lightboxCloseBtn,
+  lightboxOverlay,
+} = refs;
+
+const createGalleryCardsMarkup = (galleryItems) => {
+  return galleryItems
+    .map(({ preview, original, description }) => {
+      return `
+    <li class="gallery__item">
+      <a
+        class="gallery__link"
+        href="${original}"
+      >
+        <img
+          class="gallery__image"
+          src="${preview}"
+          data-source="${original}"
+          alt="${description}"
+        />
+      </a>
+    </li>
+    `;
+    })
+    .join("");
+};
+
+galleryCardsRef.insertAdjacentHTML(
+  "beforeend",
+  createGalleryCardsMarkup(galleryItems)
+);
+
+const onEscKeyDown = (event) => {
+  if (event.code === "Escape") {
+    onLightboxClose();
+  }
+};
+
+const onArrowLeftKeyDown = (event) => {
+  // console.log(lightboxImgRef.src === event.target.href);
+  if (event.code === "ArrowLeft") {
+    lightboxImgRef.src = galleryItems.map((item) => item.original)[
+      galleryItems.map((item) => item.original).indexOf(lightboxImgRef.src) - 1
+    ];
+  }
+};
+
+const onArrowRightKeyDown = (event) => {
+  if (event.code === "ArrowRight") {
+    lightboxImgRef.src = galleryItems.map((item) => item.original)[
+      galleryItems.map((item) => item.original).indexOf(lightboxImgRef.src) + 1
+    ];
+  }
+};
+
+const onLightboxOpen = (event) => {
+  if (!event.target.classList.contains("gallery__image")) {
+    return;
+  }
+
+  event.preventDefault();
+
+  window.addEventListener("keydown", onEscKeyDown);
+  window.addEventListener("keydown", onArrowLeftKeyDown);
+  window.addEventListener("keydown", onArrowRightKeyDown);
+
+  lightboxRef.classList.toggle("is-open");
+  lightboxImgRef.src = event.target.dataset.source;
+  lightboxImgRef.alt = event.target.alt;
+};
+
+galleryCardsRef.addEventListener("click", onLightboxOpen);
+
+const onLightboxClose = () => {
+  window.removeEventListener("keydown", onEscKeyDown);
+  window.removeEventListener("keydown", onArrowLeftKeyDown);
+  window.removeEventListener("keydown", onArrowRightKeyDown);
+
+  lightboxRef.classList.toggle("is-open");
+  lightboxImgRef.src = "";
+  lightboxImgRef.alt = "";
+};
+
+lightboxCloseBtn.addEventListener("click", onLightboxClose);
+
+const onLightboxClick = (event) => {
+  if (event.currentTarget === event.target) {
+    onLightboxClose();
+  }
+};
+lightboxOverlay.addEventListener("click", onLightboxClick);
