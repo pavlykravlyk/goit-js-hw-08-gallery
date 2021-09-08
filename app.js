@@ -115,21 +115,25 @@ const onEscKeyDown = (event) => {
   }
 };
 
-const onArrowLeftKeyDown = (event) => {
-  // console.log(lightboxImgRef.src === event.target.href);
-  if (event.code === "ArrowLeft") {
-    lightboxImgRef.src = galleryItems.map((item) => item.original)[
-      galleryItems.map((item) => item.original).indexOf(lightboxImgRef.src) - 1
-    ];
-  }
-};
+const onArrowKeyDown = (event) => {
+  let currentIndex = galleryItems.findIndex(
+    (item) =>
+      item.description === lightboxImgRef.alt ||
+      item.original === lightboxImgRef.src
+  );
 
-const onArrowRightKeyDown = (event) => {
-  if (event.code === "ArrowRight") {
-    lightboxImgRef.src = galleryItems.map((item) => item.original)[
-      galleryItems.map((item) => item.original).indexOf(lightboxImgRef.src) + 1
-    ];
+  if (event.code === "ArrowLeft") {
+    currentIndex !== 0 ? (currentIndex -= 1) : (currentIndex = 0);
   }
+
+  if (event.code === "ArrowRight") {
+    currentIndex !== galleryItems.length - 1
+      ? (currentIndex += 1)
+      : (currentIndex = galleryItems.length - 1);
+  }
+
+  lightboxImgRef.alt = galleryItems[currentIndex].description;
+  lightboxImgRef.src = galleryItems[currentIndex].original;
 };
 
 const onLightboxOpen = (event) => {
@@ -140,8 +144,7 @@ const onLightboxOpen = (event) => {
   event.preventDefault();
 
   window.addEventListener("keydown", onEscKeyDown);
-  window.addEventListener("keydown", onArrowLeftKeyDown);
-  window.addEventListener("keydown", onArrowRightKeyDown);
+  window.addEventListener("keydown", onArrowKeyDown);
 
   lightboxRef.classList.toggle("is-open");
   lightboxImgRef.src = event.target.dataset.source;
@@ -152,8 +155,7 @@ galleryCardsRef.addEventListener("click", onLightboxOpen);
 
 const onLightboxClose = () => {
   window.removeEventListener("keydown", onEscKeyDown);
-  window.removeEventListener("keydown", onArrowLeftKeyDown);
-  window.removeEventListener("keydown", onArrowRightKeyDown);
+  window.removeEventListener("keydown", onArrowKeyDown);
 
   lightboxRef.classList.toggle("is-open");
   lightboxImgRef.src = "";
@@ -167,4 +169,5 @@ const onLightboxClick = (event) => {
     onLightboxClose();
   }
 };
+
 lightboxOverlay.addEventListener("click", onLightboxClick);
