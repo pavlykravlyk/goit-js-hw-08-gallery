@@ -109,13 +109,7 @@ galleryCardsRef.insertAdjacentHTML(
   createGalleryCardsMarkup(galleryItems)
 );
 
-const onEscKeyDown = (event) => {
-  if (event.code === "Escape") {
-    onLightboxClose();
-  }
-};
-
-const onArrowKeyDown = (event) => {
+const onKeyDown = (event) => {
   let currentIndex = galleryItems.findIndex(
     (item) =>
       item.description === lightboxImgRef.alt ||
@@ -134,6 +128,10 @@ const onArrowKeyDown = (event) => {
 
   lightboxImgRef.alt = galleryItems[currentIndex].description;
   lightboxImgRef.src = galleryItems[currentIndex].original;
+
+  if (event.code === "Escape") {
+    onLightboxClose();
+  }
 };
 
 const onLightboxOpen = (event) => {
@@ -142,9 +140,7 @@ const onLightboxOpen = (event) => {
   }
 
   event.preventDefault();
-
-  window.addEventListener("keydown", onEscKeyDown);
-  window.addEventListener("keydown", onArrowKeyDown);
+  window.addEventListener("keydown", onKeyDown);
 
   lightboxRef.classList.toggle("is-open");
   lightboxImgRef.src = event.target.dataset.source;
@@ -154,8 +150,7 @@ const onLightboxOpen = (event) => {
 galleryCardsRef.addEventListener("click", onLightboxOpen);
 
 const onLightboxClose = () => {
-  window.removeEventListener("keydown", onEscKeyDown);
-  window.removeEventListener("keydown", onArrowKeyDown);
+  window.removeEventListener("keydown", onKeyDown);
 
   lightboxRef.classList.toggle("is-open");
   lightboxImgRef.src = "";
@@ -163,11 +158,4 @@ const onLightboxClose = () => {
 };
 
 lightboxCloseBtn.addEventListener("click", onLightboxClose);
-
-const onLightboxClick = (event) => {
-  if (event.currentTarget === event.target) {
-    onLightboxClose();
-  }
-};
-
-lightboxOverlay.addEventListener("click", onLightboxClick);
+lightboxOverlay.addEventListener("click", onLightboxClose);
